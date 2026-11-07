@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>插件登录系统</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ============ 登录页面 - 蓝紫渐变卡片风格 ============ */
+    #login-view {
+      display: none;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #login-view .container { width: 100%; max-width: 420px; }
+    #login-view .card {
+      background-color: white;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 0.5s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    #login-view .title { text-align: center; margin-bottom: 35px; }
+    #login-view .title h1 { font-size: 28px; color: #333; font-weight: 700; margin-bottom: 8px; }
+    #login-view .title p { font-size: 14px; color: #666; }
+    #login-view .input-group { margin-bottom: 25px; }
+    #login-view .input-group label { display: block; font-size: 14px; color: #555; margin-bottom: 8px; font-weight: 500; }
+    #login-view .input-group input {
+      width: 100%; padding: 14px 16px;
+      border: 2px solid #e0e0e0; border-radius: 8px;
+      font-size: 15px; transition: all 0.3s ease;
+      background: #f9f9f9;
+      color: #333;
+    }
+    #login-view .input-group input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+    #login-view .btn {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white; border: none; border-radius: 8px;
+      font-size: 16px; font-weight: 600; cursor: pointer;
+      transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    #login-view .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6); }
+    #login-view .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+    #login-view .error { color: #ff4757; font-size: 14px; margin-top: 16px; text-align: center; min-height: 20px; }
+    #login-view .change-card {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #999;
+      font-size: 13px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    #login-view .change-card:hover {
+      color: #667eea;
+    }
+
+    /* ============ 更新弹窗 ============ */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 9999; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: white; border-radius: 16px; padding: 30px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: modalIn 0.3s ease; }
+    @keyframes modalIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+    .modal-icon { width: 60px; height: 60px; background: linear-gradient(135deg, #ffa502, #ff6348); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 28px; }
+    .modal-title { font-size: 20px; font-weight: 700; color: #333; margin-bottom: 12px; }
+    .modal-message { font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 25px; }
+    .modal-btn { padding: 12px 30px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin: 0 5px; }
+    .modal-btn-download { background: linear-gradient(135deg, #ffa502, #ff6348); color: white; }
+    .modal-btn-download:hover { box-shadow: 0 4px 15px rgba(255,165,2,0.5); }
+    .modal-btn-close { background: #f0f0f0; color: #666; }
+    .modal-btn-close:hover { background: #e0e0e0; }
+  </style>
+</head>
+<body>
+
+  <!-- ======== 登录页面 ======== -->
+  <div id="login-view">
+    <div class="container">
+      <div class="card">
+        <div class="title"><h1>输入卡密验证登录</h1></div>
+        <div class="input-group">
+          <label for="card-number">ss卡密</label>
+          <input type="text" id="card-number" placeholder="请输入您的卡密" autocomplete="off">
+        </div>
+        <button id="fetch-cookie" class="btn">验证登录</button>
+        <div id="error-message" class="error"></div>
+        <a id="change-card" class="change-card">更换卡密</a>
+      </div>
+    </div>
+
+    <!-- 更新弹窗 -->
+    <div id="update-modal" class="modal-overlay">
+      <div class="modal">
+        <div class="modal-icon">⬆️</div>
+        <div class="modal-title" id="modal-title">发现新版本</div>
+        <div class="modal-message" id="modal-message">发现新版本，请下载更新！</div>
+        <div>
+          <button id="modal-download" class="modal-btn modal-btn-download">下载新版本</button>
+          <button id="modal-close" class="modal-btn modal-btn-close">稍后再说</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

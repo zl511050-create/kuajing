@@ -1,0 +1,26 @@
+li[data-react-aria-pressable="true"] {
+  display: none;
+}
+
+/* 隐藏设置按钮 */
+div[data-node-key="6"],
+div[data-node-key="6"] * {
+  display: none !important;
+}
+
+/* 隐藏子账号管理按钮 */
+div[data-node-key="4"],
+div[data-node-key="4"] * {
+  display: none !important;
+}
+/* 隐藏三个点菜单按钮 */
+button.ant-tabs-nav-more,
+button.ant-tabs-nav-more * {
+  display: none !important;
+}
+
+/* 隐藏头像下拉框（手机号/账号ID/会员版本/账号中心/账号设置/退出登录等） */
+.account-menu,
+div[role="dialog"][data-slot="base"]:has(.account-menu) {
+  display: none !important;
+}

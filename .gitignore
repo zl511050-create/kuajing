@@ -1,0 +1,25 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Browser profiles (Local Chromium cache & sessions, ~900MB - DO NOT COMMIT)
+scraper/browser_profile/
+scraper/browser_profile_flagship/
+
+# Local runtime & checkpoint files
+scraper/live_status.json
+scraper/cruise_checkpoint.json
+
+# Operating System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Log and temporary files
+*.log
+*.tmp
